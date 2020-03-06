@@ -9,6 +9,24 @@ const bodyParser = require(`body-parser`);
 const app = express();
 const upload = require(`multer`)({ dest: `/tmp-reports/` });
 const port = process.env.CARBONE_PORT || 3030;
+const basicAuth = require("express-basic-auth");
+const username = process.env.USERNAME || undefined;
+const password = process.env.PASSWORD || undefined;
+
+if (!username || !password) {
+  console.error(
+    "missing authentication credentials. Please pass USERNAME and PASSWORD environment variables"
+  );
+  process.exit(-1);
+}
+
+function auth() {
+  return basicAuth({
+    users: { [username]: password }
+  });
+}
+
+app.use(auth());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
