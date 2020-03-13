@@ -2,19 +2,28 @@
 
 Embedded Carbone in a Docker image with simple REST API.
 
-## E-Mail deployment
-
-Generated reports can be sent via E-Mail if the request has a _mailto_ field containing recipient addresses stored as a JSON array of strings. If empty or left out, no mail will be sent.
-
-The server is currently hard-coded to send mails to an SMTP server listening on `localhost:3535`. `npm run smtp-dummy` starts one that just logs incoming SMTP requests to standard output.
-
 ## Authentication
 
-Requests require HTTP Basic Authentication. Username and password must be passed to the node process via the USERNAME and PASSWORD environment variables, otherwise it will exit immedately with a non-zero exit code and, thus, stop the container.
+Requests require HTTP Basic Authentication. Username and password must be passed to the server process via the USERNAME and PASSWORD environment variables, otherwise it will exit immedately with a non-zero exit code and, thus, stop the container.
+
+## E-Mail deployment
+
+Generated reports can be sent via E-Mail if the request has a _mailto_ field with a JSON array of strings containing recipient addresses. If left out, empty or invalid, no emails will be sent.
+
+The SMTP client connection can be configured by a set of environment variables:
+
+- _SMTP_HOST_, _SMTP_PORT_ - host and port to connect to
+- _SMTP_USER_ - username for SMTP authentication and as sender in messages' _FROM_ field
+- _SMTP_PASSWORD_ - password for SMTP authentication
+- _SMTP_UNSAFE_: if left undefined or empty (default), will attempt to use TLS encryption.
+
+You can execute `npm run smtp-dummy` to launch a local dummy SMTP server that will log all received mails to standard output.
+
+Executing `run-local.sh` will setup all environment variables to connect to it and launch the API server.
 
 ## How to consume exposed API ?
 
-The simpliest way to use this image is to use `node` and install [`carbone-connect` package](https://npmjs.org/carbone-connect).
+~~The simpliest way to use this image is to use `node` and install [`carbone-connect` package](https://npmjs.org/carbone-connect).~~ We extended the API with authentication, so this doesn't work anymore. :(
 
 ## From carbone.io website
 
