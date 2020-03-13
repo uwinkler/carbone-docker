@@ -22,11 +22,35 @@ if (!username || !password) {
   process.exit(-1);
 }
 
-const transport = nodemailer.createTransport({
-  secure: false,
-  ignoreTLS: true,
-  port: 3535
-});
+function configureSmtp() {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASSWORD;
+
+  const host = process.env.SMTP_HOST;
+  const port = process.env.SMTP_PORT && parseInt(process.env.SMTP_PORT);
+
+  const unsafe = process.env.SMTP_UNSAFE;
+
+  const auth = user && pass ? { user, pass } : undefined;
+
+  const smtp = {
+    ignoreTLS: unsafe,
+    auth,
+    host,
+    port
+  };
+
+  const config = {
+    user,
+    smtp
+  };
+
+  return config;
+}
+
+const config = configureSmtp();
+
+const transport = nodemailer.createTransport(config.smtp);
 
 function auth() {
   return basicAuth({
@@ -113,7 +137,7 @@ app.post("/render", upload.single(`template`), async (req, res) => {
 
       if (recipients.length > 0) {
         await transport.sendMail({
-          from: "pdf@kodiradev.de",
+          from: config.user,
           to: recipients,
           subject: "Ding! Your Report is Ready",
           text:
@@ -129,9 +153,7 @@ app.post("/render", upload.single(`template`), async (req, res) => {
         console.info(`no email recipients given, won't send any mails`);
       }
     } catch (e) {
-      console.error(
-        `failed parsing email recipients from request's "mailto" field: ${e}`
-      );
+      console.error(`cannot send emails: ${e}`);
     }
   }
 
