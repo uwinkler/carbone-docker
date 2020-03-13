@@ -19,7 +19,7 @@ const server = new SMTPServer({
   // call callback
   onData: (stream, session, callback) => {
     simpleParser(stream, (err, parsed) => {
-      const { from, to, attachments } = parsed;
+      const { from, to, attachments, subject, text } = parsed;
       if (err) {
         return callback(err);
       }
@@ -27,6 +27,9 @@ const server = new SMTPServer({
       console.log("GOT MAIL");
       console.log(`  from: ${from.text}`);
       console.log(`  to: ${to.value.map(addr => addr.address).join(", ")}`);
+      console.log(`  subject: ${subject}`);
+      console.log(`  text: ${text}`);
+
       if (attachments.length > 0) {
         console.log("  attachments:");
         for (const attachment of attachments) {
