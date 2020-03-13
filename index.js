@@ -125,23 +125,28 @@ app.post("/render", upload.single(`template`), async (req, res) => {
   Send mail, if requested
   ------------------------------------------------------ */
 
-  if (req.body.mailto) {
+  if (req.body.email) {
     try {
-      const recipients = JSON.parse(req.body.mailto);
-      if (!Array.isArray(recipients)) {
-        throw new Error(`request's "mailto" field is not an array`);
+      const email = JSON.parse(req.body.email);
+      if (!Array.isArray(email.to)) {
+        throw new Error(`email.to is not an array`);
       }
-      if (recipients.some(entry => typeof entry !== "string")) {
-        throw new Error(`request's "mailto" field contains non-string entries`);
+      if (email.to.some(entry => typeof entry !== "string")) {
+        throw new Error(`email.to contains non-string entries`);
+      }
+      if (!email.subject || !(typeof email.subject === "string")) {
+        throw new Error(`email.subject is missing or not a string`);
+      }
+      if (!email.subject || !(typeof email.subject === "string")) {
+        throw new Error(`email.text is missing or not a string`);
       }
 
-      if (recipients.length > 0) {
+      if (email.to.length > 0) {
         await transport.sendMail({
           from: config.user,
-          to: recipients,
-          subject: "Ding! Your Report is Ready",
-          text:
-            "Congratulations, we just prepared your report. Grab it while it's hot and fresh out of the oven!",
+          to: email.to,
+          subject: email.subject,
+          text: email.text,
           attachments: [
             {
               filename: "report.pdf",

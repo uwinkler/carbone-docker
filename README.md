@@ -8,7 +8,11 @@ Requests require HTTP Basic Authentication. Username and password must be passed
 
 ## E-Mail deployment
 
-Generated reports can be sent via E-Mail if the request has a _mailto_ field with a JSON array of strings containing recipient addresses. If left out, empty or invalid, no emails will be sent.
+Generated reports can be sent via E-Mail if the request has a _email_ field with a JSON object. The object can contain the following properties:
+
+- _to: string[]_ - an Array of strings containing email addresses to which the mail is sent. If left out, empty or invalid, no emails will be sent.
+- _subject: string_ - used as a subject line on all sent mails
+- _text: string_ - used as the plaintext message body on all sent mails
 
 The SMTP client connection can be configured by a set of environment variables:
 
