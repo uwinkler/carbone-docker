@@ -23,6 +23,44 @@ if (!username || !password) {
   process.exit(-1);
 }
 
+class Storage {
+  constructor(rootPath) {
+    this.rootPath = rootPath;
+  }
+
+  // try writing a file to confirm the location to store files
+  // at works as intended
+  check() {
+    const testFilePath = path.join(this.rootPath, "test.txt");
+    const testFileContent =
+      "This is a test file to confirm the carbone server can write to this directory.";
+    fs.writeFileSync(testFilePath, testFileContent, "utf8");
+    const content = fs.readFileSync(testFilePath, "utf8");
+
+    if (content !== testFileContent) {
+      throw new Error(
+        `file storage location ${this.rootPath} can't store files`
+      );
+    }
+  }
+  store(data) {
+    const hasher = crypto.createHash("sha256");
+    hasher.update(data);
+    const hash = hasher.digest("hex");
+
+    const directoryPath = path.join(this.rootPath, hash);
+    fs.mkdirSync(directoryPath);
+    const filePath = path.join(directoryPath, "result.pdf");
+    fs.writeFileSync(filePath, data);
+
+    return hash;
+  }
+
+  path(hash) {
+    return path.join(this.rootPath, hash, "result.pdf");
+  }
+}
+
 function configureStorage(rootPath) {
   if (typeof rootPath !== "string") {
     console.log(
@@ -31,38 +69,12 @@ function configureStorage(rootPath) {
     return undefined;
   }
 
-  // try writing a file to confirm the location to store files
-  // at works as intended
-  const testFilePath = path.join(rootPath, "test.txt");
-  const testFileContent =
-    "This is a test file to confirm the carbone server can write to this directory.";
-  fs.writeFileSync(testFilePath, testFileContent, "utf8");
-  const content = fs.readFileSync(testFilePath, "utf8");
-
-  if (content !== testFileContent) {
-    throw new Error(`file storage location ${rootPath} can't store files`);
-  }
+  const storage = new Storage(rootPath);
+  storage.check();
 
   console.log(`file storage ${rootPath} confirmed!`);
 
-  return {
-    store: data => {
-      const hasher = crypto.createHash("sha256");
-      hasher.update(data);
-      const hash = hasher.digest("hex");
-
-      const directoryPath = path.join(rootPath, hash);
-      fs.mkdirSync(directoryPath);
-      const filePath = path.join(directoryPath, "result.pdf");
-      fs.writeFileSync(filePath, data);
-
-      return hash;
-    },
-
-    path: hash => {
-      return path.join(rootPath, hash, "result.pdf");
-    }
-  };
+  return storage;
 }
 
 function configureSmtp() {
@@ -223,8 +235,8 @@ app.post("/render", upload.single(`template`), async (req, res) => {
   }
 
   if (storage) {
-    const hash = storage.store(report);
-    res.setHeader("Location", `/files/${hash}`);
+    const id = storage.store(report);
+    res.setHeader("Location", `/files/${id}`);
     return res.sendStatus(301);
   }
 
