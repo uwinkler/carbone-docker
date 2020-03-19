@@ -22,6 +22,26 @@ if (!username || !password) {
   process.exit(-1);
 }
 
+function configureStorage(rootPath) {
+  if (typeof rootPath !== "string") {
+    return undefined;
+  }
+
+  // try writing a file to confirm the location to store files
+  // at works as intended
+  const testFilePath = path.join(rootPath, "test.txt");
+  const testFileContent =
+    "This is a test file to confirm the carbone server can write to this directory.";
+  fs.writeFileSync(testFilePath, testFileContent, "utf8");
+  const content = fs.readFileSync(testFilePath, "utf8");
+
+  if (content !== testFileContent) {
+    throw new Error(`file storage location ${rootPath} can't store files`);
+  }
+
+  console.log(`file storage ${rootPath} confirmed!`);
+}
+
 function configureSmtp() {
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASSWORD;
@@ -51,6 +71,8 @@ function configureSmtp() {
 const config = configureSmtp();
 
 const transport = nodemailer.createTransport(config.smtp);
+
+const storage = configureStorage(process.env.STORAGE_PATH);
 
 function auth() {
   return basicAuth({
@@ -160,6 +182,10 @@ app.post("/render", upload.single(`template`), async (req, res) => {
     } catch (e) {
       console.error(`cannot send emails: ${e}`);
     }
+  }
+
+  if (storage) {
+    // TODO: store file and return info on how to get it
   }
 
   res.setHeader(
