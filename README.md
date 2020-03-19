@@ -31,6 +31,8 @@ If the environment variable _STORAGE_PATH_ is set to a writable location, genera
 
 PDF contents are hashed and the generated file is stored in `<STORAGE_PATH>/<hash>/result.pdf`.
 
+Stored files are available via HTTP (with authentication) at `/files/<hash>`.
+
 _TODO: not yet implemented, will be documented once done_
 
 ## How to consume exposed API ?

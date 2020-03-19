@@ -52,6 +52,10 @@ function configureStorage(rootPath) {
       fs.mkdirSync(directoryPath);
       const filePath = path.join(directoryPath, "result.pdf");
       fs.writeFileSync(filePath, data);
+    },
+
+    path: hash => {
+      return path.join(rootPath, hash, "result.pdf");
     }
   };
 }
@@ -106,6 +110,21 @@ _.forEach(carbone.formatters, formatter => (formatter.$isDefault = true));
 
 app.get("/", (req, res) => {
   res.sendFile(path.resolve(`./test.html`));
+});
+
+function isHash(value) {
+  return typeof value === "string" && /^\/file\/[0-9a-f]{64}$/.test;
+}
+
+app.get("/file/:hash", async (req, res) => {
+  const hash = req.params.hash;
+  if (!isHash(hash)) {
+    return res.sendStatus(404);
+  }
+
+  const filePath = storage.path(hash);
+  res.setHeader("Content-Disposition", 'attachment; filename="report.pdf"');
+  res.sendFile(filePath);
 });
 
 app.post("/render", upload.single(`template`), async (req, res) => {
