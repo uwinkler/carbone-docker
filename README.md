@@ -33,6 +33,8 @@ PDF contents are hashed and the generated file is stored in `<STORAGE_PATH>/<has
 
 Stored files are available via HTTP (with authentication) at `/files/<hash>`.
 
+If files are stored, a POST request to `/render` will receive a redirection response (301) to the stored location. This should work for most sufficiently standard-conforming HTTP clients; tested fine with cURL.
+
 _TODO: not yet implemented, will be documented once done_
 
 ## How to consume exposed API ?

@@ -7,8 +7,8 @@ DATA_FILE=testdata.min.json
 
 DATA=`cat ${DATA_FILE}`
 
-curl -f\
-  -X POST\
+# tell curl to follow redirects as the server may redirect to a stored document
+curl -f --location\
   -u demo:demo\
   -F "template=@${TEMPLATE_FILE};type=application/vnd.oasis.opendocument.text"\
   -F data="$DATA"\

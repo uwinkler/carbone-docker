@@ -55,6 +55,8 @@ function configureStorage(rootPath) {
       fs.mkdirSync(directoryPath);
       const filePath = path.join(directoryPath, "result.pdf");
       fs.writeFileSync(filePath, data);
+
+      return hash;
     },
 
     path: hash => {
@@ -221,8 +223,9 @@ app.post("/render", upload.single(`template`), async (req, res) => {
   }
 
   if (storage) {
-    storage.store(report);
-    // TODO: store file and return info on how to get it
+    const hash = storage.store(report);
+    res.setHeader("Location", `/files/${hash}`);
+    return res.sendStatus(301);
   }
 
   res.setHeader(
