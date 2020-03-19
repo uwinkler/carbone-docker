@@ -1,4 +1,4 @@
 #!/bin/sh
-source ./smtp-dummy.env
+source ./local-config.env
 source ./auth.env
 node index.js

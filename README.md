@@ -23,7 +23,13 @@ The SMTP client connection can be configured by a set of environment variables:
 
 You can execute `npm run smtp-dummy` to launch a local dummy SMTP server that will log all received mails to standard output.
 
-Executing `run-local.sh` will setup all environment variables to connect to it and launch the API server.
+Executing `local-run.sh` will setup all environment variables to connect to it and launch the API server.
+
+## File Storage
+
+If the environment variable _STORAGE_PATH_ is set to a writable location, generated files will be stored there.
+
+_TODO: not yet implemented, will be documented once done_
 
 ## How to consume exposed API ?
 
