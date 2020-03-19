@@ -1,5 +1,6 @@
 const path = require(`path`);
 const fs = require(`fs-extra`);
+const crypto = require("crypto");
 const _ = require(`lodash`);
 const util = require(`util`);
 const carbone = require(`carbone`);
@@ -40,6 +41,19 @@ function configureStorage(rootPath) {
   }
 
   console.log(`file storage ${rootPath} confirmed!`);
+
+  return {
+    store: data => {
+      const hasher = crypto.createHash("sha256");
+      hasher.update(data);
+      const hash = hasher.digest("hex");
+
+      const directoryPath = path.join(rootPath, hash);
+      fs.mkdirSync(directoryPath);
+      const filePath = path.join(directoryPath, "result.pdf");
+      fs.writeFileSync(filePath, data);
+    }
+  };
 }
 
 function configureSmtp() {
@@ -185,6 +199,7 @@ app.post("/render", upload.single(`template`), async (req, res) => {
   }
 
   if (storage) {
+    storage.store(report);
     // TODO: store file and return info on how to get it
   }
 

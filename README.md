@@ -29,6 +29,8 @@ Executing `local-run.sh` will setup all environment variables to connect to it a
 
 If the environment variable _STORAGE_PATH_ is set to a writable location, generated files will be stored there.
 
+PDF contents are hashed and the generated file is stored in `<STORAGE_PATH>/<hash>/result.pdf`.
+
 _TODO: not yet implemented, will be documented once done_
 
 ## How to consume exposed API ?
