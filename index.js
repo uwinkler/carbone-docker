@@ -119,7 +119,7 @@ function isHash(value) {
   return typeof value === "string" && /^\/file\/[0-9a-f]{64}$/.test;
 }
 
-app.get("/file/:hash", async (req, res) => {
+app.get("/files/:hash", async (req, res) => {
   const hash = req.params.hash;
   if (!isHash(hash)) {
     return res.sendStatus(404);
