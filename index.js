@@ -25,6 +25,9 @@ if (!username || !password) {
 
 function configureStorage(rootPath) {
   if (typeof rootPath !== "string") {
+    console.log(
+      "no file storage configured; generated files will not be stored."
+    );
     return undefined;
   }
 
