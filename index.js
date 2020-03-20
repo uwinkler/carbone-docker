@@ -12,6 +12,8 @@ const port = process.env.CARBONE_PORT || 3030;
 const basicAuth = require("express-basic-auth");
 const nodemailer = require("nodemailer");
 
+const { Storage } = require("./storage");
+
 const username = process.env.USERNAME || undefined;
 const password = process.env.PASSWORD || undefined;
 
@@ -20,6 +22,22 @@ if (!username || !password) {
     "missing authentication credentials. Please pass USERNAME and PASSWORD environment variables"
   );
   process.exit(-1);
+}
+
+function configureStorage(rootPath) {
+  if (typeof rootPath !== "string" || rootPath.length === 0) {
+    console.log(
+      "no file storage configured; generated files will not be stored."
+    );
+    return undefined;
+  }
+
+  const storage = new Storage(rootPath);
+
+  storage.validate();
+  console.log(`working file storage on ${rootPath} configured`);
+
+  return storage;
 }
 
 function configureSmtp() {
@@ -52,6 +70,8 @@ const config = configureSmtp();
 
 const transport = nodemailer.createTransport(config.smtp);
 
+const storage = configureStorage(process.env.STORAGE_PATH);
+
 function auth() {
   return basicAuth({
     users: { [username]: password }
@@ -70,6 +90,21 @@ _.forEach(carbone.formatters, formatter => (formatter.$isDefault = true));
 
 app.get("/", (req, res) => {
   res.sendFile(path.resolve(`./test.html`));
+});
+
+app.get("/files/:hash", async (req, res) => {
+  if (!storage) {
+    return res.sendStatus(404);
+  }
+
+  const hash = req.params.hash;
+  if (!storage.isHash(hash)) {
+    return res.sendStatus(404);
+  }
+
+  const filePath = storage.path(hash);
+  res.setHeader("Content-Disposition", 'attachment; filename="report.pdf"');
+  res.sendFile(filePath);
 });
 
 app.post("/render", upload.single(`template`), async (req, res) => {
@@ -160,6 +195,12 @@ app.post("/render", upload.single(`template`), async (req, res) => {
     } catch (e) {
       console.error(`cannot send emails: ${e}`);
     }
+  }
+
+  if (storage) {
+    const id = storage.store(report);
+    res.setHeader("Location", `/files/${id}`);
+    return res.sendStatus(301);
   }
 
   res.setHeader(
