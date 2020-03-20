@@ -11,5 +11,5 @@ RUN dpkg -i *.deb
 RUN mkdir /tmp/reports
 COPY . /carbone-api
 WORKDIR /carbone-api
-RUN yarn
+RUN npm install
 CMD node index
