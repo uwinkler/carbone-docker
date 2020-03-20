@@ -4,12 +4,12 @@ ENV LIBREOFFICE_VERSION=6.3.3.1
 
 # install LibreOffice and its dependencies
 WORKDIR /tmp
-RUN wget \
+RUN wget -nv \
   http://downloadarchive.documentfoundation.org/libreoffice/old/${LIBREOFFICE_VERSION}/deb/x86_64/LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb.tar.gz \
   -O libo.tar.gz
 RUN apt update \
   && apt install -y libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6 unzip \
-  && tar -zxvf libo.tar.gz
+  && tar -zxf libo.tar.gz
 WORKDIR /tmp/LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb/DEBS
 RUN dpkg -i *.deb
 
