@@ -25,7 +25,7 @@ if (!username || !password) {
 }
 
 function configureStorage(rootPath) {
-  if (typeof rootPath !== "string") {
+  if (typeof rootPath !== "string" || rootPath.length === 0) {
     console.log(
       "no file storage configured; generated files will not be stored."
     );
@@ -33,9 +33,9 @@ function configureStorage(rootPath) {
   }
 
   const storage = new Storage(rootPath);
-  storage.check();
 
-  console.log(`file storage ${rootPath} confirmed!`);
+  storage.validate();
+  console.log(`working file storage on ${rootPath} configured`);
 
   return storage;
 }
@@ -92,13 +92,13 @@ app.get("/", (req, res) => {
   res.sendFile(path.resolve(`./test.html`));
 });
 
-function isHash(value) {
-  return typeof value === "string" && /^\/file\/[0-9a-f]{64}$/.test;
-}
-
 app.get("/files/:hash", async (req, res) => {
+  if (!storage) {
+    return res.sendStatus(404);
+  }
+
   const hash = req.params.hash;
-  if (!isHash(hash)) {
+  if (!storage.isHash(hash)) {
     return res.sendStatus(404);
   }
 

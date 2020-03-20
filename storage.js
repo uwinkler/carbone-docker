@@ -9,7 +9,7 @@ class Storage {
 
   // try writing a file to confirm the location to store files
   // at works as intended
-  check() {
+  validate() {
     const testFilePath = path.join(this.rootPath, "test.txt");
     const testFileContent =
       "This is a test file to confirm the carbone server can write to this directory.";
@@ -22,6 +22,7 @@ class Storage {
       );
     }
   }
+
   store(data) {
     const hasher = crypto.createHash("sha256");
     hasher.update(data);
@@ -33,6 +34,10 @@ class Storage {
     fs.writeFileSync(filePath, data);
 
     return hash;
+  }
+
+  isHash(value) {
+    return typeof value === "string" && /[0-9a-f]{64}$/.test(value);
   }
 
   path(hash) {
