@@ -15,4 +15,5 @@ COPY package.json package-lock.json ./
 USER node
 RUN npm install
 COPY --chown=node:node . .
+EXPOSE 3030
 CMD node index
