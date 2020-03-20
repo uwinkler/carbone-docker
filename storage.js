@@ -10,6 +10,7 @@ class Storage {
   // try writing a file to confirm the location to store files
   // at works as intended
   validate() {
+    fs.mkdirpSync(this.rootPath);
     const testFilePath = path.join(this.rootPath, "test.txt");
     const testFileContent =
       "This is a test file to confirm the carbone server can write to this directory.";

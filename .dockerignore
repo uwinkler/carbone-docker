@@ -1,1 +1,10 @@
-**/node_modules
+# dependencies
+node_modules
+
+# Docker metadata
+Dockerfile
+.dockerignore
+
+# VCS metadata
+.git
+.gitignore
