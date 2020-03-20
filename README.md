@@ -27,15 +27,12 @@ Executing `local-run.sh` will setup all environment variables to connect to it a
 
 ## File Storage
 
-If the environment variable _STORAGE_PATH_ is set to a writable location, generated files will be stored there.
+By default, generated files are sent directly to the client. Set the _STORAGE_PATH_ environment variable to a writable location and they will be stored there.
 
-PDF contents are hashed and the generated file is stored in `<STORAGE_PATH>/<hash>/result.pdf`.
-
-Stored files are available via HTTP (with authentication) at `/files/<hash>`.
-
-If files are stored, a POST request to `/render` will receive a redirection response (301) to the stored location. This should work for most sufficiently standard-conforming HTTP clients; tested fine with cURL.
-
-_TODO: not yet implemented, will be documented once done_
+- each file will be content-hashed
+- generated files it will be stored as `<STORAGE_PATH>/<hash>/result.pdf`
+- files will be retrievable via HTTP GET (authenticated) on `/files/<hash>`
+- requests to `/render` will not get the file in the response body. Instead, they will be redirected to the above location (status code 301).
 
 ## How to consume exposed API ?
 
