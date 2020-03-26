@@ -24,8 +24,10 @@ if (!username || !password) {
   process.exit(-1);
 }
 
-function configureStorage(rootPath) {
-  if (typeof rootPath !== "string" || rootPath.length === 0) {
+function configureStorage() {
+  const rootPath = process.env.STORAGE_PATH;
+
+  if (!rootPath) {
     console.log(
       "no file storage configured; generated files will not be stored."
     );
@@ -70,7 +72,7 @@ const config = configureSmtp();
 
 const transport = nodemailer.createTransport(config.smtp);
 
-const storage = configureStorage(process.env.STORAGE_PATH);
+const storage = configureStorage();
 
 function auth() {
   return basicAuth({
