@@ -21,6 +21,15 @@ USER node
 RUN npm install
 COPY --chown=node:node . .
 
-# create cache directory
+# runtime server configuration, empty by default
+ENV STORAGE_PATH=
+
+ENV SMTP_HOST=
+ENV SMTP_PORT=
+ENV SMTP_USER=
+ENV SMTP_PASSWORD=
+ENV SMTP_UNSAFE=
+
+# run HTTP API server by default
 EXPOSE 3030
 CMD node index
