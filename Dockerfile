@@ -15,11 +15,21 @@ RUN dpkg -i *.deb
 
 # install node package
 RUN mkdir -p /home/node/carbone-api/node_modules && chown -R node:node /home/node/carbone-api
-RUN mkdir /tmp/reports
 WORKDIR /home/node/carbone-api
 COPY package.json package-lock.json ./
 USER node
 RUN npm install
 COPY --chown=node:node . .
+
+# runtime server configuration, empty by default
+ENV STORAGE_PATH=
+
+ENV SMTP_HOST=
+ENV SMTP_PORT=
+ENV SMTP_USER=
+ENV SMTP_PASSWORD=
+ENV SMTP_UNSAFE=
+
+# run HTTP API server by default
 EXPOSE 3030
 CMD node index
