@@ -118,7 +118,7 @@ app.post("/render", upload.single(`template`), async (req, res) => {
   const originalFormat = template.originalname.split(`.`).reverse()[0];
   let data = req.body.data;
   let options = {};
-  let formatters = {};
+  let customFormatters = {};
 
   try {
     options = JSON.parse(req.body.options);
@@ -136,16 +136,24 @@ app.post("/render", upload.single(`template`), async (req, res) => {
   }
 
   try {
-    formatters = telejson.parse(req.body.formatters);
+    customFormatters = telejson.parse(req.body.formatters);
   } catch (e) {}
 
-  // Removing previous custom formatters before adding new ones
-  carbone.formatters = _.filter(
-    carbone.formatters,
-    formatter => formatter.$isDefault === true
-  );
+  const defaultFormatters = {};
 
-  carbone.addFormatters(formatters);
+  // Of all formatters filter out the ones that were marked with $default
+  for (const name in carbone.formatters) {
+    const formatterFunc = carbone.formatters[name];
+    if (formatterFunc.$isDefault) {
+      defaultFormatters[name] = formatterFunc;
+    }
+  }
+
+  // Replace all formatters with only the default formatters
+  carbone.formatters = defaultFormatters;
+
+  // Then add custom formatters that may have been provided inside the POST request
+  carbone.addFormatters(customFormatters);
 
   let report = null;
 
