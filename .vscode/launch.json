@@ -1,0 +1,25 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Program",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "env": {
+                "SMTP_HOST": "localhost",
+                "SMTP_PORT": "3535",
+                "SMTP_USER": "pdf@kodiradev.de",
+                "SMTP_UNSAFE": "1",
+                "USERNAME": "demo",
+                "PASSWORD": "demo",
+            },  
+            "program": "${workspaceFolder}/index.js"
+        }
+    ]
+}
